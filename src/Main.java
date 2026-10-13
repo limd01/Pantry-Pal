@@ -7,11 +7,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-// Todo: 
-// - allow user to see list of recipes when searching for a specific recipe
-// - handle bad recipe book file (empty, not in right format)
-// - allow user to exit selection at anytime
-
 /**
  * Main is used to maintain the user's interactions with the
  * game, handle bad input, and keep track of time and
@@ -42,39 +37,71 @@ public class Main {
         System.out.println("Welcome to Pantry Pal!");
         System.out.println("I am here to help you with dinner. We can review recipes, create grocery lists, and more!\n");
 
-        while (inUse) {
-            printMenu();
+        Recipe temp;
 
-            switch (readMenuInput(scanner)) {
-                case 'A':
-                    outputRecipeList();
-                    break;
-                case 'B':
-                    System.out.println(readNameInput(scanner).toString());
-                    break;
-                case 'C':
-                    recipeBook.add(readNewRecipe(scanner));
-                    break;
-                case 'D':
-                    if (recipeBook.remove(readNameInput(scanner))) {
-                        System.out.println("Successfully removed recipe.");
-                    } else {
-                        System.out.println("Failed to remove recipe.");
+        while (inUse) {
+            if (recipeBook.size() == 0) {
+                boolean madeSelection = false;
+                while (!madeSelection) {
+                    System.out.print("There are currently no recipes in your recipe book. Would you like to add your first recipe (y) or exit (n)? ");
+                    String input = scanner.nextLine();
+                    if (input.toLowerCase().equals("y") || input.toLowerCase().equals("yes")) {
+                        temp = readNewRecipe(scanner);
+                        if (temp != null) {
+                            recipeBook.add(temp);
+                            madeSelection = true;
+                        }
+                    } 
+                    else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) {
+                        madeSelection = true;
+                        inUse = false;
                     }
-                    break;
-                case 'E':
-                    makeGroceryList(scanner);
-                    break;
-                case 'F':
-                    recipeRoulette(scanner);
-                    break;
-                case 'G':
-                    System.out.println("Enjoy your meal! Come back again soon!");
-                    saveRecipeBook(fileName, recipeBook);
-                    inUse = false;
-                    break;
-                default:
-                    System.out.print("Please make a selection from the menu");
+                }
+            }
+            else {
+                printMenu();
+                switch (readMenuInput(scanner)) {
+                    case 'A':
+                        outputRecipeList();
+                        break;
+                    case 'B':
+                        temp = readNameInput(scanner);
+                        if (temp != null) {
+                            System.out.println(temp.toString());
+                        }
+                        break;
+                    case 'C':
+                        temp = readNewRecipe(scanner);
+                        if (temp != null) {
+                            recipeBook.add(temp);
+                        }
+                        break;
+                    case 'D':
+                        temp = readNameInput(scanner);
+                        if (temp != null) {
+                            if (recipeBook.remove(temp)) {
+                                System.out.println("Successfully removed recipe.");
+                            } else {
+                                System.out.println("Failed to remove recipe.");
+                            }   
+                        }
+                        break;
+                    case 'E':
+                        makeGroceryList(scanner);
+                        break;
+                    case 'F':
+                        recipeRoulette(scanner);
+                        break;
+                    case 'G':
+                        System.out.println("Enjoy your meal! Come back again soon!");
+                        saveRecipeBook(fileName, recipeBook);
+                        inUse = false;
+                        break;
+                    case 'Z':
+                        break;
+                    default:
+                        System.out.print("Please make a selection from the menu");
+                }
             }
         }
     }
@@ -105,7 +132,9 @@ public class Main {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Could not find RecipeBook save file. Creating new file.");
+            saveRecipeBook(fileName, retrievedRecipeBook);
+
         }
         return retrievedRecipeBook;
     }
@@ -128,7 +157,7 @@ public class Main {
                 out.println(str);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Could not write to RecipeBook file.");
         }
     }
 
@@ -180,22 +209,46 @@ public class Main {
 
     private Recipe readNameInput(Scanner scanner) {
         while (true) {
-            System.out.print("Enter the exact recipe title: ");
-            System.out.flush();
+            System.out.print("Would you like to search with the specific title of the recipe (1), view titles of existing recipes (2), or \"exit\"? ");
             String input = scanner.nextLine();
 
             if (input.equals("")) {
                 System.out.println(
-                    "It does not look like you entered a name. Make sure to enter the exact name from list.");
+                    "It does not look like you answered. Make sure to enter either '1' or '2'.");
             }
             else {
-                input = input.toLowerCase();
-                for (int i = 0; i < recipeBook.size(); i++) {
-                    if (recipeBook.get(i).getTitle().toLowerCase().equals(input)) {
-                        return recipeBook.get(i);
+                if (input.equals("1")) {
+                    System.out.print("Enter the exact recipe title or \"exit\": ");
+                    System.out.flush();
+                    input = scanner.nextLine();
+
+                    if (input.equals("")) {
+                        System.out.println(
+                            "It does not look like you entered a name. Make sure to enter the exact name from list.");
                     }
+                    else if (input.toLowerCase().equals("exit")) {
+                        return null;
+                    }
+                    else {
+                        input = input.toLowerCase();
+                        for (int i = 0; i < recipeBook.size(); i++) {
+                            if (recipeBook.get(i).getTitle().toLowerCase().equals(input)) {
+                                return recipeBook.get(i);
+                            }
+                        }
+                        System.out.println("It looks like you entered a recipe title that is not currently in the recipe book. Please enter a recipe in the book.");
+                    }
+                } 
+                else if (input.equals("2")) {
+                    outputRecipeList();
+                } 
+                else if (input.equals("exit")) {
+                    return null;
                 }
-                System.out.println("It looks like you entered a recipe title that is not currently in the recipe book. Please enter a recipe in the book.");
+                else {
+                    System.out.println(
+                        "It looks like you entered a something other than expected. Please enter a either '1' or '2'.");
+                }
             }
         }
     }
@@ -215,7 +268,7 @@ public class Main {
         boolean onlineRecipe = false;
 
         while (!madeSelection) {
-            System.out.print("Would you like to create an online recipe (1) or offline recipe (2)? ");
+            System.out.print("Would you like to create an online recipe (1), offline recipe (2), or \"exit\"? ");
             String input = scanner.nextLine();
 
             if (input.equals("")) {
@@ -226,9 +279,13 @@ public class Main {
                 if (input.equals("1")) {
                     onlineRecipe = true;
                     madeSelection = true;
-                } else if (input.equals("2")) {
+                } 
+                else if (input.equals("2")) {
                     onlineRecipe = false;
                     madeSelection = true;
+                } 
+                else if (input.toLowerCase().equals("exit")) {
+                    return null;
                 }
                 else {
                     System.out.println(
@@ -240,16 +297,19 @@ public class Main {
         madeSelection = false;
         while (!madeSelection) {
             if (onlineRecipe) {
-                System.out.print("Please enter a link for the recipe: ");
+                System.out.print("Please enter a link for the recipe or \"exit\": ");
             }
             else {
-                System.out.print("Please enter a creator for the recipe: ");
+                System.out.print("Please enter a creator for the recipe or \"exit\": ");
             }
             String input = scanner.nextLine();
 
             if (input.equals("")) {
                 System.out.println(
                     "The input cannot be empty. Please enter the requested input.");
+            }
+            else if (input.toLowerCase().equals("exit")) {
+                return null;
             }
             else {
                 linkOrCreator = input;
@@ -259,12 +319,15 @@ public class Main {
 
         madeSelection = false;
         while (!madeSelection) {
-            System.out.print("Please enter a title for the recipe: ");
+            System.out.print("Please enter a title for the recipe or \"exit\": ");
             String input = scanner.nextLine();
 
             if (input.equals("")) {
                 System.out.println(
                     "The title cannot be empty. Please enter a title for the recipe.");
+            }
+            else if (input.toLowerCase().equals("exit")) {
+                return null;
             }
             else {
                 boolean titleUsed = false;
@@ -283,7 +346,7 @@ public class Main {
 
         madeSelection = false;
         while (!madeSelection) {
-            System.out.print("Would you like to add an ingredient to the recipe? (y/n) ");
+            System.out.print("Would you like to add an ingredient to the recipe (y/n) or \"exit\"? ");
             String input = scanner.nextLine();
 
             if (input.equals("")) {
@@ -349,12 +412,16 @@ public class Main {
 
                     ingredients.add(new Ingredient(name, amount, unit));
 
-                } else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) {
+                }
+                else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) {
                     if (ingredients.size() == 0) {
                         System.out.println("You must enter at least one ingredient. Please enter an ingredient");
                     } else {
                         madeSelection = true;
                     }
+                }
+                else if (input.toLowerCase().equals("exit")) {
+                    return null;
                 }
                 else {
                     System.out.println(
@@ -377,7 +444,7 @@ public class Main {
             Boolean madeSelection = false;
 
             while (!madeSelection) {
-                System.out.print("Would you like to add a new recipe? (y/n) ");
+                System.out.print("Would you like to add a new recipe to grocery list (y/n) or \"exit\"? ");
                 String input = scanner.nextLine();
 
                 if (input.equals("")) {
@@ -386,11 +453,20 @@ public class Main {
                 }
                 else {
                     if (input.toLowerCase().equals("y") || input.toLowerCase().equals("yes")) {
-                        recipeList.add(readNameInput(scanner));
+                        Recipe temp = readNameInput(scanner);
+                        if (temp != null) {
+                            recipeList.add(temp);
+                        }
                         madeSelection = true;
-                    } else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) {
+                    } 
+                    else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) {
                         madeSelection = true;
                         addRecipe = false;
+                    } 
+                    else if (input.toLowerCase().equals("exit")){
+                        madeSelection = true;
+                        addRecipe = false;
+                        recipeList = null;
                     }
                     else {
                         System.out.println(
@@ -400,28 +476,34 @@ public class Main {
             }
         }
 
-        LinkedChain<String> ingredientNames = new LinkedChain<>();
-        List<String> output = new ArrayList<>();
-        for (int i = 0; i < recipeList.size(); i++) {
-            Recipe recipe = recipeList.get(i);
-            for (int j = 0; j < recipe.getIngredients().size(); j++) {
-                Ingredient ingredient = recipe.getIngredients().get(j);
-                if (ingredientNames.contains(ingredient.getName())) {
-                    for (int k = 0; k < ingredientNames.size(); k++) {
-                        if (ingredientNames.get(k).equals(ingredient.getName())) {
-                            output.set(k, output.get(k) + ", " + ingredient.getAmount() + " " + ingredient.getUnits());
-                        }
-                    } 
-                } else {
-                    ingredientNames.add(ingredient.getName());
-                    output.add(" - " + ingredient.toString());
+        if (recipeList != null) {
+            List<String> ingredientNames = new ArrayList<>();
+            List<String> output = new ArrayList<>();
+            for (int i = 0; i < recipeList.size(); i++) {
+                Recipe recipe = recipeList.get(i);
+                System.out.println("Checking recipe: " + recipe.getTitle());
+                for (int j = 0; j < recipe.getIngredients().size(); j++) {
+                    Ingredient ingredient = recipe.getIngredients().get(j);
+                    System.out.println("Checking ingredient: " + ingredient.getName());
+                    if (ingredientNames.contains(ingredient.getName())) {
+                        for (int k = 0; k < ingredientNames.size(); k++) {
+                            if (ingredientNames.get(k).toLowerCase().equals(ingredient.getName().toLowerCase())) {
+                                System.out.print("Found same: " + ingredient.getName());
+                                output.set(k, output.get(k) + ", " + ingredient.getAmount() + " " + ingredient.getUnits());
+                            }
+                        } 
+                    } else {
+                        System.out.println("New so adding to grocery list.");
+                        ingredientNames.add(ingredient.getName());
+                        output.add(" - " + ingredient.toString());
+                    }
                 }
             }
-        }
 
-        System.out.println("\nList of Groceries: ");
-        for (int i = 0; i < output.size(); i++) {
-            System.out.println(output.get(i));
+            System.out.println("\nList of Groceries: ");
+            for (int i = 0; i < output.size(); i++) {
+                System.out.println(output.get(i));
+            }
         }
     }
 
@@ -431,6 +513,7 @@ public class Main {
         System.out.println("What would you like to do?");
         System.out.println("A) Get a random recipe");
         System.out.println("B) Get a random recipe with a specified ingredient");
+        System.out.println("C) Exit");
 
         boolean madeSelection = false;
         char selection = 'Z';
@@ -451,7 +534,7 @@ public class Main {
                 }
                 else {
                     char inputChar = Character.toUpperCase(inputArray[0]);
-                    if (inputChar != 'A' && inputChar != 'B') {
+                    if (inputChar != 'A' && inputChar != 'B' && inputChar != 'C') {
                         System.out.println(
                             "It looks like you entered a selection that was not available in the menu. Please enter a single letter selection that is available in the menu.");
                     }
@@ -465,25 +548,28 @@ public class Main {
 
         if (selection == 'A') {
             System.out.println("\n" + recipeBook.get(random.nextInt(recipeBook.size())).toString());
-        } else if (selection == 'B') {
-            System.out.print("What ingredient would you like to limit the randomized selection by: ");
+        } 
+        else if (selection == 'B') {
+            System.out.print("What ingredient would you like to limit the randomized selection by or \"exit\": ");
             String input = scanner.nextLine();
-            List<Integer> indexes = new ArrayList<>();
-            for (int i = 0; i < recipeBook.size(); i++) {
-                boolean found = false;
-                Recipe recipe = recipeBook.get(i);
-                for (int j = 0; j < recipe.getIngredients().size() && !found; j++) {
-                    if (recipe.getIngredients().get(j).getName().toLowerCase().equals(input.toLowerCase())) {
-                        indexes.add(i);
-                        found = true;
+            if (!(input.toLowerCase().equals("exit"))) {
+                List<Integer> indexes = new ArrayList<>();
+                for (int i = 0; i < recipeBook.size(); i++) {
+                    boolean found = false;
+                    Recipe recipe = recipeBook.get(i);
+                    for (int j = 0; j < recipe.getIngredients().size() && !found; j++) {
+                        if (recipe.getIngredients().get(j).getName().toLowerCase().equals(input.toLowerCase())) {
+                            indexes.add(i);
+                            found = true;
+                        }
                     }
                 }
-            }
 
-            if (indexes.size() > 0) {
-                System.out.println(recipeBook.get(indexes.get(random.nextInt(indexes.size()))));
-            } else {
-                System.out.println("There are no recipes in the recipe book that use the ingredient: " + input + ".");
+                if (indexes.size() > 0) {
+                    System.out.println(recipeBook.get(indexes.get(random.nextInt(indexes.size()))));
+                } else {
+                    System.out.println("There are no recipes in the recipe book that use the ingredient: " + input + ".");
+                }
             }
         }
     }
