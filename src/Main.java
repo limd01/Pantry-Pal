@@ -106,6 +106,10 @@ public class Main {
         }
     }
 
+    /**
+     * main method that maintains recipe book and user interaction
+     * @param args
+     */
     public static void main(String args[]) {
         new Main();
     }
