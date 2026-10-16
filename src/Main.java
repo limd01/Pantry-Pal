@@ -51,6 +51,8 @@ public class Main
                     System.out.print(
                         "There are currently no recipes in your recipe book. Would you like to add your first recipe (y) or exit (n)? ");
                     String input = scanner.nextLine();
+                    recipeBook = new LinkedChain<>();
+                    
                     if (input.toLowerCase().equals("y")
                         || input.toLowerCase().equals("yes"))
                     {
