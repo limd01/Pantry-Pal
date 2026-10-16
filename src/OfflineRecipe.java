@@ -3,8 +3,8 @@
 /**
  *  The offline recipe class represents a recipe not available online
  * 
- *  @author 
- *  @version Oct 15, 2026
+ *  @author Aditi Sambaraju
+ *  @version 2026.10.09
  */
 public class OfflineRecipe extends Recipe {
     private String creator;

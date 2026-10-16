@@ -3,8 +3,8 @@
 /**
  *  The online recipe class represents a recipe available online
  *  link for the recipe is read by main class
- *  @author 
- *  @version Oct 15, 2026
+ *  @author Aditi Samaraju
+ *  @version 2026.10.09
  */
 public class OnlineRecipe extends Recipe {
     private String link;
