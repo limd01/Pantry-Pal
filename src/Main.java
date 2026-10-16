@@ -52,7 +52,7 @@ public class Main
                         "There are currently no recipes in your recipe book. Would you like to add your first recipe (y) or exit (n)? ");
                     String input = scanner.nextLine();
                     recipeBook = new LinkedChain<>();
-                    
+
                     if (input.toLowerCase().equals("y")
                         || input.toLowerCase().equals("yes"))
                     {
@@ -514,6 +514,8 @@ public class Main
         }
 
         madeSelection = false;
+        LinkedChain<String> ingredientNames = new LinkedChain<>(); 
+        
         while (!madeSelection)
         {
             System.out.print(
@@ -553,9 +555,13 @@ public class Main
                             madeSelection1 = true;
                             madeSelection = true;
                         }
+                        else if (ingredientNames.contains(input)) {
+                            System.out.println("This ingredient is already in the recipe. Please enter a new ingredient.");
+                        }
                         else
                         {
                             name = input;
+                            ingredientNames.add(input);
                             madeSelection1 = true;
                         }
                     }
