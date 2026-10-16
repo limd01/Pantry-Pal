@@ -536,14 +536,20 @@ public class Main
 
                     while (!madeSelection1)
                     {
-                        System.out
-                            .print("Please enter the name of the ingredient: ");
+                        System.out.print(
+                            "Please enter the name of the ingredient or \"exit\": ");
                         input = scanner.nextLine();
 
                         if (input.equals(""))
                         {
                             System.out.println(
                                 "The name cannot be empty. Please enter the name of the ingredient.");
+                        }
+                        else if (input.equals("exit"))
+                        {
+                            name = null;
+                            madeSelection1 = true;
+                            madeSelection = true;
                         }
                         else
                         {
@@ -553,10 +559,10 @@ public class Main
                     }
 
                     madeSelection1 = false;
-                    while (!madeSelection1)
+                    while (!madeSelection1 && !madeSelection)
                     {
                         System.out.print(
-                            "Please enter the amount of the ingredient required: ");
+                            "Please enter the amount of the ingredient required or \"exit\": ");
                         input = scanner.nextLine();
 
                         if (input.equals(""))
@@ -564,12 +570,26 @@ public class Main
                             System.out.println(
                                 "The amount cannot be empty. Please enter the amount of the ingredient required.");
                         }
+                        else if (input.equals("exit"))
+                        {
+                            amount = 0.0;
+                            madeSelection1 = true;
+                            madeSelection = true;
+                        }
                         else
                         {
                             try
                             {
                                 amount = Double.parseDouble(input);
-                                madeSelection1 = true;
+                                if (amount <= 0)
+                                {
+                                    System.out.println(
+                                        "The amount must be greater than zero. Please enter a positive amount.");
+                                }
+                                else
+                                {
+                                    madeSelection1 = true;
+                                }
                             }
                             catch (NumberFormatException e)
                             {
@@ -581,16 +601,22 @@ public class Main
                     }
 
                     madeSelection1 = false;
-                    while (!madeSelection1)
+                    while (!madeSelection1 && !madeSelection)
                     {
                         System.out.print(
-                            "Please enter the unit of the amount of the ingredient: ");
+                            "Please enter the unit of the amount of the ingredient or \"exit\": ");
                         input = scanner.nextLine();
 
                         if (input.equals(""))
                         {
                             System.out.println(
                                 "The unit cannot be empty. Please enter the unit of the amount of the ingredient.");
+                        }
+                        else if (input.equals("exit"))
+                        {
+                            unit = null;
+                            madeSelection1 = true;
+                            madeSelection = true;
                         }
                         else
                         {
@@ -599,8 +625,10 @@ public class Main
                         }
                     }
 
-                    ingredients.add(new Ingredient(name, amount, unit));
-
+                    if (name != null && amount != 0.0 && unit != null)
+                    {
+                        ingredients.add(new Ingredient(name, amount, unit));
+                    }
                 }
                 else if (input.toLowerCase().equals("n")
                     || input.toLowerCase().equals("no"))
@@ -624,6 +652,12 @@ public class Main
                     System.out.println(
                         "It looks like you entered a something other than expected. Please enter a either 'y' or 'n'.");
                 }
+            }
+
+            if (ingredients.size() == 0)
+            {
+                System.out.println("You must enter as least one ingredient.");
+                madeSelection = false;
             }
         }
 
