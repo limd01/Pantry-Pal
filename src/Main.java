@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Main is used to maintain the user's interactions with the game, handle bad
@@ -34,97 +35,98 @@ public class Main
         fileName = "RecipeBook.csv";
 
         recipeBook = readRecipeFile(fileName);
+        if (recipeBook != null) {
+            System.out.println("Welcome to Pantry Pal!");
+            System.out.println(
+                "I am here to help you with dinner. We can review recipes, create grocery lists, and more!\n");
 
-        System.out.println("Welcome to Pantry Pal!");
-        System.out.println(
-            "I am here to help you with dinner. We can review recipes, create grocery lists, and more!\n");
+            Recipe temp;
 
-        Recipe temp;
-
-        while (inUse)
-        {
-            if (recipeBook.size() == 0)
+            while (inUse)
             {
-                boolean madeSelection = false;
-                while (!madeSelection)
+                if (recipeBook.size() == 0)
                 {
-                    System.out.print(
-                        "There are currently no recipes in your recipe book. Would you like to add your first recipe (y) or exit (n)? ");
-                    String input = scanner.nextLine();
-                    recipeBook = new LinkedChain<>();
+                    boolean madeSelection = false;
+                    while (!madeSelection)
+                    {
+                        System.out.print(
+                            "There are currently no recipes in your recipe book. Would you like to add your first recipe (y) or exit (n)? ");
+                        String input = scanner.nextLine().strip();
+                        recipeBook = new LinkedChain<>();
 
-                    if (input.toLowerCase().equals("y")
-                        || input.toLowerCase().equals("yes"))
-                    {
-                        temp = readNewRecipe(scanner);
-                        if (temp != null)
+                        if (input.toLowerCase().equals("y")
+                            || input.toLowerCase().equals("yes"))
                         {
-                            recipeBook.add(temp);
-                            madeSelection = true;
+                            temp = readNewRecipe(scanner);
+                            if (temp != null)
+                            {
+                                recipeBook.add(temp);
+                                madeSelection = true;
+                            }
                         }
-                    }
-                    else if (input.toLowerCase().equals("n")
-                        || input.toLowerCase().equals("no"))
-                    {
-                        madeSelection = true;
-                        inUse = false;
+                        else if (input.toLowerCase().equals("n")
+                            || input.toLowerCase().equals("no"))
+                        {
+                            madeSelection = true;
+                            inUse = false;
+                        }
                     }
                 }
-            }
-            else
-            {
-                printMenu();
-                switch (readMenuInput(scanner))
+                else
                 {
-                    case 'A':
-                        outputRecipeList();
-                        break;
-                    case 'B':
-                        temp = readNameInput(scanner);
-                        if (temp != null)
-                        {
-                            System.out.println(temp.toString());
-                        }
-                        break;
-                    case 'C':
-                        temp = readNewRecipe(scanner);
-                        if (temp != null)
-                        {
-                            recipeBook.add(temp);
-                        }
-                        break;
-                    case 'D':
-                        temp = readNameInput(scanner);
-                        if (temp != null)
-                        {
-                            if (recipeBook.remove(temp))
+                    printMenu();
+                    switch (readMenuInput(scanner))
+                    {
+                        case 'A':
+                            outputRecipeList();
+                            break;
+                        case 'B':
+                            temp = readNameInput(scanner);
+                            if (temp != null)
                             {
-                                System.out
-                                    .println("Successfully removed recipe.");
+                                System.out.println(temp.toString());
                             }
-                            else
+                            break;
+                        case 'C':
+                            temp = readNewRecipe(scanner);
+                            if (temp != null)
                             {
-                                System.out.println("Failed to remove recipe.");
+                                recipeBook.add(temp);
                             }
-                        }
-                        break;
-                    case 'E':
-                        makeGroceryList(scanner);
-                        break;
-                    case 'F':
-                        recipeRoulette(scanner);
-                        break;
-                    case 'G':
-                        System.out
-                            .println("Enjoy your meal! Come back again soon!");
-                        saveRecipeBook(fileName);
-                        inUse = false;
-                        break;
-                    case 'Z':
-                        break;
-                    default:
-                        System.out
-                            .print("Please make a selection from the menu");
+                            break;
+                        case 'D':
+                            temp = readNameInput(scanner);
+                            if (temp != null)
+                            {
+                                if (recipeBook.remove(temp))
+                                {
+                                    System.out
+                                        .println("Successfully removed recipe.");
+                                }
+                                else
+                                {
+                                    System.out.println("Failed to remove recipe.");
+                                }
+                            }
+                            break;
+                        case 'E':
+                            makeGroceryList(scanner);
+                            break;
+                        case 'F':
+                            recipeRoulette(scanner);
+                            break;
+                        case 'G':
+                            System.out
+                                .println("Enjoy your meal! Come back again soon!");
+                            saveRecipeBook(fileName);
+                            inUse = false;
+                            break;
+                        case 'Z':
+                            break;
+                        default:
+                            System.out
+                                .print("Please make a selection from the menu");
+                    }
                 }
             }
         }
@@ -157,36 +159,73 @@ public class Main
             while (scanner.hasNextLine())
             {
                 LinkedChain<Ingredient> recipeIngredients = new LinkedChain<>();
-                try (Scanner rowScanner = new Scanner(scanner.nextLine()))
+                try (Scanner rowScanner = new Scanner(scanner.nextLine().strip()))
                 {
                     rowScanner.useDelimiter(" \\| ");
-                    String recipeTitle = rowScanner.next();
-                    String next = rowScanner.next();
+                    String recipeTitle;
+                    String next;
+                    try {
+                        recipeTitle = rowScanner.next();
+                        next = rowScanner.next();
+                    } catch (NoSuchElementException e) {
+                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        return null;
+                    }
                     while (!next.equals("0"))
-                    {
+                    {   
+                        try {
                         recipeIngredients.add(
                             new Ingredient(
                                 next,
                                 Double.parseDouble(rowScanner.next()),
                                 rowScanner.next()));
-                        next = rowScanner.next();
+                            } catch (NumberFormatException e) {
+                                System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                                return null;
+                            }
+                        try {
+                            next = rowScanner.next();
+                        } catch (NoSuchElementException e) {
+                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                            return null;
+                        }
                     }
-                    String type = rowScanner.next();
+                    String type;
+                    try {
+                        type = rowScanner.next();
+                    } catch (NoSuchElementException e) {
+                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        return null;
+                    }
                     if (type.equals("1"))
                     {
-                        retrievedRecipeBook.add(
-                            new OnlineRecipe(
-                                recipeTitle,
-                                rowScanner.next(),
-                                recipeIngredients));
+                        try {
+                            retrievedRecipeBook.add(
+                                new OnlineRecipe(
+                                    recipeTitle,
+                                    rowScanner.next(),
+                                    recipeIngredients));
+                        } catch (NumberFormatException e) {
+                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                            return null;
+                        }
                     }
-                    else
+                    else if (type.equals("2"))
                     {
-                        retrievedRecipeBook.add(
-                            new OfflineRecipe(
-                                recipeTitle,
-                                rowScanner.next(),
-                                recipeIngredients));
+                        try {
+                            retrievedRecipeBook.add(
+                                new OfflineRecipe(
+                                    recipeTitle,
+                                    rowScanner.next(),
+                                    recipeIngredients));
+                        } catch (NumberFormatException e) {
+                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                            return null;
+                        }
+                    }
+                    else {
+                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        return null;
                     }
                 }
             }
@@ -274,7 +313,7 @@ public class Main
         while (!madeSelection)
         {
             System.out.print("Please select an option from the menu: ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -324,7 +363,7 @@ public class Main
         {
             System.out.print(
                 "Would you like to search with the specific title of the recipe (1), view titles of existing recipes (2), or \"exit\"? ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -338,7 +377,7 @@ public class Main
                     System.out
                         .print("Enter the exact recipe title or \"exit\": ");
                     System.out.flush();
-                    input = scanner.nextLine();
+                    input = scanner.nextLine().strip();
 
                     if (input.equals(""))
                     {
@@ -415,7 +454,7 @@ public class Main
         {
             System.out.print(
                 "Would you like to create an online recipe (1), offline recipe (2), or \"exit\"? ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -459,7 +498,7 @@ public class Main
                 System.out.print(
                     "Please enter a creator for the recipe or \"exit\": ");
             }
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -482,7 +521,7 @@ public class Main
         {
             System.out
                 .print("Please enter a title for the recipe or \"exit\": ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -520,7 +559,7 @@ public class Main
         {
             System.out.print(
                 "Would you like to add an ingredient to the recipe (y/n) or \"exit\"? ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -542,7 +581,7 @@ public class Main
                     {
                         System.out.print(
                             "Please enter the name of the ingredient or \"exit\": ");
-                        input = scanner.nextLine();
+                        input = scanner.nextLine().strip();
 
                         if (input.equals(""))
                         {
@@ -571,7 +610,7 @@ public class Main
                     {
                         System.out.print(
                             "Please enter the amount of the ingredient required or \"exit\": ");
-                        input = scanner.nextLine();
+                        input = scanner.nextLine().strip();
 
                         if (input.equals(""))
                         {
@@ -613,7 +652,7 @@ public class Main
                     {
                         System.out.print(
                             "Please enter the unit of the amount of the ingredient or \"exit\": ");
-                        input = scanner.nextLine();
+                        input = scanner.nextLine().strip();
 
                         if (input.equals(""))
                         {
@@ -699,7 +738,7 @@ public class Main
             {
                 System.out.print(
                     "Would you like to add a new recipe to grocery list (y/n) or \"exit\"? ");
-                String input = scanner.nextLine();
+                String input = scanner.nextLine().strip();
 
                 if (input.equals(""))
                 {
@@ -810,7 +849,7 @@ public class Main
         while (!madeSelection)
         {
             System.out.print("Please select an option from the menu: ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             if (input.equals(""))
             {
@@ -853,7 +892,7 @@ public class Main
         {
             System.out.print(
                 "What ingredient would you like to limit the randomized selection by or \"exit\": ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
             if (!(input.toLowerCase().equals("exit")))
             {
                 List<Integer> indexes = new ArrayList<>();
