@@ -57,7 +57,7 @@ Further validation of the recipe book file will be implemented by Anna. Further 
 | OfflineRecipeTest Class | Aditi | Implemented based on spec |
 | Ingredient Class | Anna | Implemented based on spec |
 | IngredientTest Class | Anna | Implemented based on spec |
-| Main Class | Sarah | Implemented based on spec and revised |
+| Main Class | Sarah | Implemented based on spec and revised, Used GenAI to help with read and writing to a csv file |
 | Bad input survives | Sarah | Added to main class and tested |
 | Reflection | Aditi | Drafted and added to README |
 | Next steps | Anna | Drafted and added to README |
