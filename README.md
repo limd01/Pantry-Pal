@@ -20,7 +20,7 @@ Run the project from root directory so the program can load the recipes correctl
 ## Example recipes to copy into RecipeBook
 Boiled Cookies | vanilla | 1.0 | tsp | chopped nuts | 0.5 | cup | peanut butter | 0.5 | cup | quick oats | 3.0 | cup | cocoa | 0.5 | cup | butter | 0.5 | cup | milk | 0.5 | cup | sugar | 2.0 | cup | 0 | 2 | Grandma
 Cranberry Salad | orange juice | 1.0 | cup | crushed pineapple | 1.0 | cup | walnuts | 1.0 | cup | crushed cranberries | 1.0 | cup | sugar | 0.75 | cup | cherry jello | 1.5 | boxes | 0 | 2 | Grandma
-Bananna Bread | bananna | 3.0 | ripe | all purpose flour | 2.0 | cup | baking soda | 1.0 | tsp | egg | 2.0 | whole | white sugar | 1.0 | cup | shortening | 0.5 | cup | 0 | 2 | Grandma
+Banana Bread | banana | 3.0 | ripe | all purpose flour | 2.0 | cup | baking soda | 1.0 | tsp | egg | 2.0 | whole | white sugar | 1.0 | cup | shortening | 0.5 | cup | 0 | 2 | Grandma
 Oatmeal Cookies | flour | 2.0 | cup | baking powder | 1.0 | tsp | salt | 1.0 | tsp | cinnamon | 1.0 | tsp | baking soda | 0.5 | tsp | quick oats | 3.0 | cup | raisins | 1.0 | cup | margarine | 1.25 | cup | sugar | 1.75 | cup | egg | 2.0 | whole | milk | 0.25 | cup | 0 | 2 | Grandma
 Yuletide Gummies | butter | 0.5 | lb | conf. sugar | 0.5 | cup | sifted flour | 2.0 | cup | salt | 0.25 | tsp | vanilla | 1.0 | tsp | chopped walnuts | 1.0 | cup | 0 | 2 | Grandma
 

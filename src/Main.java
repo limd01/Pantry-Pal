@@ -35,7 +35,8 @@ public class Main
         fileName = "RecipeBook.csv";
 
         recipeBook = readRecipeFile(fileName);
-        if (recipeBook != null) {
+        if (recipeBook != null)
+        {
             System.out.println("Welcome to Pantry Pal!");
             System.out.println(
                 "I am here to help you with dinner. We can review recipes, create grocery lists, and more!\n");
@@ -100,12 +101,13 @@ public class Main
                             {
                                 if (recipeBook.remove(temp))
                                 {
-                                    System.out
-                                        .println("Successfully removed recipe.");
+                                    System.out.println(
+                                        "Successfully removed recipe.");
                                 }
                                 else
                                 {
-                                    System.out.println("Failed to remove recipe.");
+                                    System.out
+                                        .println("Failed to remove recipe.");
                                 }
                             }
                             break;
@@ -116,8 +118,8 @@ public class Main
                             recipeRoulette(scanner);
                             break;
                         case 'G':
-                            System.out
-                                .println("Enjoy your meal! Come back again soon!");
+                            System.out.println(
+                                "Enjoy your meal! Come back again soon!");
                             saveRecipeBook(fileName);
                             inUse = false;
                             break;
@@ -159,72 +161,100 @@ public class Main
             while (scanner.hasNextLine())
             {
                 LinkedChain<Ingredient> recipeIngredients = new LinkedChain<>();
-                try (Scanner rowScanner = new Scanner(scanner.nextLine().strip()))
+                try (
+                    Scanner rowScanner =
+                        new Scanner(scanner.nextLine().strip()))
                 {
                     rowScanner.useDelimiter(" \\| ");
                     String recipeTitle;
                     String next;
-                    try {
+                    try
+                    {
                         recipeTitle = rowScanner.next();
                         next = rowScanner.next();
-                    } catch (NoSuchElementException e) {
-                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                    }
+                    catch (NoSuchElementException e)
+                    {
+                        System.out.println(
+                            "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                         return null;
                     }
                     while (!next.equals("0"))
-                    {   
-                        try {
-                        recipeIngredients.add(
-                            new Ingredient(
-                                next,
-                                Double.parseDouble(rowScanner.next()),
-                                rowScanner.next()));
-                            } catch (NumberFormatException e) {
-                                System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
-                                return null;
-                            }
-                        try {
+                    {
+                        try
+                        {
+                            recipeIngredients.add(
+                                new Ingredient(
+                                    next,
+                                    Double.parseDouble(rowScanner.next()),
+                                    rowScanner.next()));
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            System.out.println(
+                                "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                            return null;
+                        }
+                        try
+                        {
                             next = rowScanner.next();
-                        } catch (NoSuchElementException e) {
-                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        }
+                        catch (NoSuchElementException e)
+                        {
+                            System.out.println(
+                                "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                             return null;
                         }
                     }
                     String type;
-                    try {
+                    try
+                    {
                         type = rowScanner.next();
-                    } catch (NoSuchElementException e) {
-                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                    }
+                    catch (NoSuchElementException e)
+                    {
+                        System.out.println(
+                            "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                         return null;
                     }
                     if (type.equals("1"))
                     {
-                        try {
+                        try
+                        {
                             retrievedRecipeBook.add(
                                 new OnlineRecipe(
                                     recipeTitle,
                                     rowScanner.next(),
                                     recipeIngredients));
-                        } catch (NumberFormatException e) {
-                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            System.out.println(
+                                "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                             return null;
                         }
                     }
                     else if (type.equals("2"))
                     {
-                        try {
+                        try
+                        {
                             retrievedRecipeBook.add(
                                 new OfflineRecipe(
                                     recipeTitle,
                                     rowScanner.next(),
                                     recipeIngredients));
-                        } catch (NumberFormatException e) {
-                            System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            System.out.println(
+                                "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                             return null;
                         }
                     }
-                    else {
-                        System.out.println("The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
+                    else
+                    {
+                        System.out.println(
+                            "The file is not in the right format. Consider deleting the \"RecipeBook.csv\" file and restarting the code.");
                         return null;
                     }
                 }
@@ -235,7 +265,6 @@ public class Main
             System.out.println(
                 "Could not find RecipeBook save file. Creating new file.");
             saveRecipeBook(fileName);
-
         }
         return retrievedRecipeBook;
     }
@@ -251,29 +280,33 @@ public class Main
     {
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName)))
         {
-            for (int i = 0; i < recipeBook.size(); i++)
+            if (recipeBook != null)
             {
-                String str = recipeBook.get(i).getTitle();
-                LinkedChain<Ingredient> ingredients =
-                    recipeBook.get(i).getIngredients();
-                for (int j = 0; j < ingredients.size(); j++)
+                for (int i = 0; i < recipeBook.size(); i++)
                 {
-                    Ingredient ingredient = ingredients.get(j);
-                    str += " | " + ingredient.getName() + " | "
-                        + ingredient.getAmount() + " | "
-                        + ingredient.getUnits();
+                    String str = recipeBook.get(i).getTitle();
+                    LinkedChain<Ingredient> ingredients =
+                        recipeBook.get(i).getIngredients();
+                    for (int j = 0; j < ingredients.size(); j++)
+                    {
+                        Ingredient ingredient = ingredients.get(j);
+                        str += " | " + ingredient.getName() + " | "
+                            + ingredient.getAmount() + " | "
+                            + ingredient.getUnits();
+                    }
+                    str += " | 0 | ";
+                    if (recipeBook.get(i) instanceof OnlineRecipe)
+                    {
+                        str += "1 | "
+                            + ((OnlineRecipe)recipeBook.get(i)).getLink();
+                    }
+                    else
+                    {
+                        str += "2 | "
+                            + ((OfflineRecipe)recipeBook.get(i)).getCreator();
+                    }
+                    out.println(str);
                 }
-                str += " | 0 | ";
-                if (recipeBook.get(i) instanceof OnlineRecipe)
-                {
-                    str += "1 | " + ((OnlineRecipe)recipeBook.get(i)).getLink();
-                }
-                else
-                {
-                    str += "2 | "
-                        + ((OfflineRecipe)recipeBook.get(i)).getCreator();
-                }
-                out.println(str);
             }
         }
         catch (IOException e)
@@ -553,8 +586,8 @@ public class Main
         }
 
         madeSelection = false;
-        LinkedChain<String> ingredientNames = new LinkedChain<>(); 
-        
+        LinkedChain<String> ingredientNames = new LinkedChain<>();
+
         while (!madeSelection)
         {
             System.out.print(
@@ -594,8 +627,10 @@ public class Main
                             madeSelection1 = true;
                             madeSelection = true;
                         }
-                        else if (ingredientNames.contains(input)) {
-                            System.out.println("This ingredient is already in the recipe. Please enter a new ingredient.");
+                        else if (ingredientNames.contains(input))
+                        {
+                            System.out.println(
+                                "This ingredient is already in the recipe. Please enter a new ingredient.");
                         }
                         else
                         {
